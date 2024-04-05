@@ -121,7 +121,7 @@ function animation(){
     });
 }
 
-setInterval (spawnEnemy, 1000);
+// setInterval (spawnEnemy, 1000);
 canvas.addEventListener("click", (e)=>{
     const myAngle = Math.atan2(
         e.clientY - canvas.height/2,
