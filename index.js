@@ -32,20 +32,20 @@ document.querySelector("input").addEventListener("click", (e)=>{
     const userValue = document.getElementById("difficulty").value;
     if(userValue ==="Easy"){
         setInterval(spawnEnemy,2000);
-        return (difficulty= 5);
+        return (difficulty= 3);
     }
     if(userValue ==="Medium"){
-        setInterval(spawnEnemy,1400);
-        return (difficulty= 8);
+        setInterval(spawnEnemy,1600);
+        return (difficulty= 5);
         
     }
     if(userValue ==="Hard"){
-        setInterval(spawnEnemy,1000);
-        return (difficulty= 10);
+        setInterval(spawnEnemy,1200);
+        return (difficulty= 8);
         
     }
     if(userValue ==="Insane"){
-        setInterval(spawnEnemy,700);
+        setInterval(spawnEnemy,900);
         return (difficulty= 12);
         
     }
@@ -185,9 +185,11 @@ const spawnEnemy = () =>{
 
 
 //--------------Creation Animation Function--------
+
+let animationId ;
 function animation(){
     //Making Recursion
-    requestAnimationFrame(animation);
+    animationId = requestAnimationFrame(animation);
 
     //Clearing canvas on each frame 
     context.clearRect(0,0, canvas.width, canvas.height);
@@ -197,11 +199,36 @@ function animation(){
     //Generating Bullets
     weapons.forEach((weapon) =>{      
         weapon.update();
+
+        if (weapon.x + weapon.radius < 1|| weapon.y + weapon.radius < 1|| weapon.x - weapon.radius < canvas.width ||weapon.y - weapon.radius < canvas.height ){
+            weapons.splice(weaponIndex,1); 
+        }
     });
 
     //Generating Enemies
     enemies.forEach((enemy) =>{
         enemy.update();
+    });
+
+    enemies.forEach((enemy, enemyIndex) => {
+        enemy.update();
+
+        const distancebetweenPlayerAndEnemy = Math.hypot(pl.x - enemy.x , pl.y - enemy.y);
+
+        if (distancebetweenPlayerAndEnemy - pl.radius - enemy.radius < 1){
+            cancelAnimationFrame(animationId); 
+        }
+        weapons.forEach((weapon, weaponIndex) => {
+
+            const distancebetweenWeaponAndEnemy = Math.hypot(weapon.x - enemy.x , weapon.y - enemy.y);
+
+            if(distancebetweenWeaponAndEnemy - weapon.radius - enemy.radius < 1){
+               setTimeout(()=>{
+                enemies.splice(enemyIndex ,1);
+                weapons.splice(weaponIndex,1); 
+               }, 0);
+            }
+        });
     });
 }
 
