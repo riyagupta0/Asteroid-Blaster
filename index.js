@@ -145,14 +145,14 @@ const spawnEnemy = () =>{
     const enemySize = Math.random()* (40 -5) +5; 
     
     //generating random color for enemy
-    const enemyColor = `rgb(${Math.random()*250},${Math.random()*250},${Math.random()*250})`;
+    const enemyColor = `hsl(${Math.floor(Math.random()*360)}, 100%, 50%)`;
 
     //random is Enemy Spawn position
     let random;
 
     //Making enemy location Random but only from outside of screen
     if(Math.random() <0.5){
-        //Making X equal to very left oof of screen or very right oof of screen and setting Y to any where vertically
+        //Making X equal to very left off of screen or very right oof of screen and setting Y to any where vertically
         random={
             x: Math.random() <0.5 ? canvas.width+enemySize:0 - enemySize,
             y: Math.random() * canvas.height
@@ -175,8 +175,8 @@ const spawnEnemy = () =>{
 
     //Mkaing Velocity or spped of enemy by multiplying chosen difficulty to radian
     const velocity ={
-        x:Math.cos(myAngle)* 5,
-        y:Math.sin(myAngle)*5
+        x:Math.cos(myAngle)*3,
+        y:Math.sin(myAngle)*3
     };
 
     //Adding enemy to enemies array 
@@ -192,23 +192,22 @@ function animation(){
     animationId = requestAnimationFrame(animation);
 
     //Clearing canvas on each frame 
-    context.clearRect(0,0, canvas.width, canvas.height);
+    context.fillStyle = "rgb(49,49,49, 0.2)";
+    context.fillRect(0,0, canvas.width, canvas.height);
     //Drawing Player
     pl.draw();
 
     //Generating Bullets
-    weapons.forEach((weapon) =>{      
+    weapons.forEach((weapon, weaponIndex) =>{      
         weapon.update();
 
-        if (weapon.x + weapon.radius < 1|| weapon.y + weapon.radius < 1|| weapon.x - weapon.radius < canvas.width ||weapon.y - weapon.radius < canvas.height ){
-            weapons.splice(weaponIndex,1); 
+        if (weapon.x + weapon.radius < 1|| weapon.y + weapon.radius < 1|| weapon.x - weapon.radius > canvas.width ||weapon.y - weapon.radius > canvas.height ){
+            weapons.splice(weaponIndex,1);  
         }
     });
 
     //Generating Enemies
-    enemies.forEach((enemy) =>{
-        enemy.update();
-    });
+
 
     enemies.forEach((enemy, enemyIndex) => {
         enemy.update();
@@ -247,8 +246,8 @@ canvas.addEventListener("click", (e)=>{
 
     //making const speed for light weapon
     const velocity ={
-        x:Math.cos(myAngle)* 5,
-        y:Math.sin(myAngle)*5
+        x:Math.cos(myAngle)* 6,
+        y:Math.sin(myAngle)* 6
     };
 
     //Adding light weapon in weapons array
