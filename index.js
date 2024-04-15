@@ -77,7 +77,7 @@ class Player{
 
 }
 
-//----Creating Weapon Class----------------------------------------
+//----Creating Weapon class----------------------------------------
 class Weapon {
     constructor(x,y,radius, color,velocity){
         this.x = x;
@@ -125,6 +125,30 @@ class Enemy {
 
 
 
+//Creating particle class-----------
+class Particle {
+    constructor(x,y,radius, color,velocity){
+        this.x = x;
+        this.y= y;
+        this.radius = radius;
+        this.color = color;
+        this.velocity = velocity;
+
+    }
+    draw(){
+        context.beginPath();
+        context.arc(this.x,this.y,this.radius,(Math.PI/180)*0, (Math.PI /180)*360, false);
+        context.fillStyle = this.color;
+        context.fill();
+    }
+    update(){
+        this.draw();
+        (this.x += this.velocity.x),
+        (this.y += this.velocity.y);
+    }
+}
+
+
 
 //---------Main Logic Here ----------
 
@@ -136,6 +160,7 @@ const pl = new Player(playerPosition.x   ,playerPosition.y  ,15,
 
 const weapons = [];
 const enemies =[];
+const particles = [];
 
 
 //Function to Spawn Enemy at Random Location--------
@@ -197,10 +222,18 @@ function animation(){
     //Drawing Player
     pl.draw();
 
+
+    //Generating praticles
+
+    particles.forEach(particle =>{
+        particle.update();
+    });
     //Generating Bullets
     weapons.forEach((weapon, weaponIndex) =>{      
         weapon.update();
 
+
+        // Removing weapons if they are off screen
         if (weapon.x + weapon.radius < 1|| weapon.y + weapon.radius < 1|| weapon.x - weapon.radius > canvas.width ||weapon.y - weapon.radius > canvas.height ){
             weapons.splice(weaponIndex,1);  
         }
@@ -212,20 +245,48 @@ function animation(){
     enemies.forEach((enemy, enemyIndex) => {
         enemy.update();
 
+
+        //Finding distance between player and enemy
         const distancebetweenPlayerAndEnemy = Math.hypot(pl.x - enemy.x , pl.y - enemy.y);
 
+
+        //Stoping Game if enemy hit player 
         if (distancebetweenPlayerAndEnemy - pl.radius - enemy.radius < 1){
             cancelAnimationFrame(animationId); 
         }
         weapons.forEach((weapon, weaponIndex) => {
 
+             //Finding distance between weapon and enemy
             const distancebetweenWeaponAndEnemy = Math.hypot(weapon.x - enemy.x , weapon.y - enemy.y);
 
             if(distancebetweenWeaponAndEnemy - weapon.radius - enemy.radius < 1){
-               setTimeout(()=>{
-                enemies.splice(enemyIndex ,1);
-                weapons.splice(weaponIndex,1); 
-               }, 0);
+
+                for (let i = 0; i < 20; i++){
+                    particles.push(new Particle(weapon.x, weapon.y, 2, enemy.color, {
+                        x: Math.random() -0.5,
+                        y : Math.random() -0.5
+                    })
+                );
+                }
+               
+                //Reducing Size of enemy on hit 
+                if (enemy.radius > 18){
+                    gsap.to(enemy,{
+                        radius: enemy.radius - 10,
+                    });
+                    setTimeout(()=>{
+                    weapons.splice(weaponIndex,1);
+                    },0);
+                }
+
+                //Removing enemy on hit if they are below 18  
+                else{
+                    setTimeout(()=>{
+                        enemies.splice(enemyIndex,1);
+                        weapons.splice(weaponIndex,1);
+                    },0);
+                    
+                }
             }
         });
     });
